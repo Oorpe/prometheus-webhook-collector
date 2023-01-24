@@ -1,11 +1,8 @@
-#!/mnt/c/Users/roope/proj/webhook-exporter/pyvenv/bin/python
-
+#!/mnt/c/Users/Roope.Tervo/Documents/proj/prometheus-webhook-collector/pyvenv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys
-
 from blackd import patched_main
-
 if __name__ == '__main__':
-    sys.argv[0] = re.sub(r'(-script\.pyw?|\.exe)?$', '', sys.argv[0])
+    sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])
     sys.exit(patched_main())
