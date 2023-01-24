@@ -1,0 +1,9 @@
+[Unit]
+Description=prometheus exporter that receives webhook requests and exports to scrapeable http or textfile
+
+[Service]
+ExecStart={{ webhook_exporter.venv_dir }}/bin/uwsgi --http {{ webhook_exporter.host }}:{{ webhook_exporter.port }} --wsgi-file {{ webhook_exporter.dir }}/app.py --callable app
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

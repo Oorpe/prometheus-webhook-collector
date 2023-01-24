@@ -1,0 +1,19 @@
+# event_handlers should contain a list of objects with fields event_title, containing a regex expression that matches the 
+# targeted request url
+event_handlers:
+  - event_title: odalogs_.*
+    extractors:
+      help: data.event.fields.help
+      type: data.event.fields.type
+      labels:
+        - to_object(items(data.event.fields)[?contains([0], `label_`)])
+        - to_object(data.backlog[*].fields.items(@)[?[0] == `field_of_note`][])
+      value:
+        - - data.event.message
+          - /\)=([\.\d]+)/
+webhook_basepath: /webhook
+textfile_dir: /opt/textfile/webhook_stuff
+output:
+  textfile: true
+  scrapeable: true
+exporter_metrics: true
