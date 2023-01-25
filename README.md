@@ -13,6 +13,11 @@ event_handlers contains a list of handler definitions. Every definition is match
 
 Once a match is found, it's `extractors` are run over a dict like `{req, data}` where req is the vars(request) dict-like projection of the received request, and `data` is the parsed JSON payload.
 
+Can handle metrics of `type: gauge|counter|info`. 
+- Gauge-type metrics require a `value` extractor field (resolving into a string that will coerce into a python `float(value)`) to set any value to the resulting metric entry. 
+- Counter-type metrics will use the output of the `value` metric (likewise must be coercible to `float(value)`) as the amount to increment the counter by.
+- Info-type metrics require a key-value dict `dict[str,str]`
+
 ### Extractors
 
 An extractor is defined as a list of strings and nested lists of strings. 
@@ -20,15 +25,14 @@ An extractor is defined as a list of strings and nested lists of strings.
 The string can be either a `jmespath` expression or a regex expression (regex must be wrapped in slashes: `/regex_for_something.*/` )
 The nested list must be a list of jmespath or regex strings. Nested lists are processed by piping the result of the previous to the next. Non-nested extractor expressions on the other hand are separate.
 
-#### Help
+#### field `help`
 Produces the help string of the chosen metric
-#### Type
+#### field `type`
 Produces the type string of the chosen metric (options: [gauge,counter,info] for now)
-#### labels
+#### field `labels`
 Produces a list of key-value dicts, where the keys are the label names, and the values are the corresponding values. Takes a list of extractor expressions instead of single ones. 
-#### value
-Produces the actual value that will be sent to prometheus as the value of the time series denoted by the metric name and the label set.
-Gauge / Counter require floats, Info needs a single-level dict of key-value string pairs.
+#### field `value`
+Produces the actual value that will be sent to prometheus as the value of the time series denoted by the metric name and the label set. 
 
 ```yaml
 event_handlers:

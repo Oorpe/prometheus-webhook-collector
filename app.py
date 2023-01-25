@@ -1,4 +1,4 @@
-from flask import Flask, Response, request
+from flask import Flask, Response, request, render_template
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from prometheus_client import (
     make_wsgi_app,
@@ -135,6 +135,13 @@ def setup_metric(m_type, metric_name, help, labels, value, old_instance=None):
     return c
 
 
+if output["scrapeable"]:
+    # Add prometheus wsgi middleware to route /metrics requests
+    app.wsgi_app = DispatcherMiddleware(
+        app.wsgi_app, {"/metrics": make_wsgi_app(registry=registry)}
+    )
+
+
 @app.route(f"{webhook_basepath}/<event_title>", methods=["POST", "PUT", "DELETE"])
 def receive_webhook_request(event_title):
     """receive a webhook request with data"""
@@ -232,8 +239,6 @@ def receive_webhook_request(event_title):
     return Response("", status=200, mimetype="application/json")
 
 
-if output["scrapeable"]:
-    # Add prometheus wsgi middleware to route /metrics requests
-    app.wsgi_app = DispatcherMiddleware(
-        app.wsgi_app, {"/metrics": make_wsgi_app(registry=registry)}
-    )
+@app.route("/")
+def index():
+    return render_template("index.html", config=config)

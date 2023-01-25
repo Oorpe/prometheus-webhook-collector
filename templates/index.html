@@ -1,0 +1,56 @@
+<head>
+  <meta charset="UTF-8" />
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename= 'css/normalize.css') }}"
+  />
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename= 'css/skeleton.css') }}"
+  />
+  <title>Webhook Exporter</title>
+</head>
+<body>
+  <div class="container">
+    <h4>Loaded config</h4>
+    <ul></ul>
+    {% if config.output.textfile %}
+    <li>
+      textfile output (as collected by node-exporter's textfile collector)
+      written into <code>{{config.textfile_dir}}/webhook_metrics.prom</code>
+    </li>
+    {% endif %} {% if config.output.scrapeable %}
+    <li>scrapeable metric output at <a href="metrics">/metrics</a></li>
+    {% endif %}
+    <h4>Event handlers:</h4>
+    {% for handler in config.event_handlers %}
+    <ul>
+      <li>
+        <span> Receive POST/PUT/DELETE events matching path </span>
+        <code>{{config.webhook_basepath}}/[{{ handler.event_title }}]</code>
+        <table>
+          <thead>
+            <th>field</th>
+            <th>extractor</th>
+          </thead>
+          <tbody>
+            {% for extractor in handler.extractors %}
+            <tr>
+              <td>{{extractor}}</td>
+              <td>
+                {% if handler.extractors[extractor] is string %}
+                <code>{{handler.extractors[extractor]}}</code>
+                {% else %} 
+                {% for section in handler.extractors[extractor] %}
+                <p><code>{{ section }}</code></p>
+                {% endfor %} {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </li>
+    </ul>
+    {% endfor %}
+  </div>
+</body>
